@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flora AI</title>
+<link rel="icon" type="image/png" href="icon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,300&family=Yeseva+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+ 
+<body>
+ 
+<!-- ══ SPLASH ══ -->
+<div id="splash">
+  <div class="splash-seedling">🌱</div>
+  <div class="splash-logo">Flora</div>
+  <div class="splash-sub">Real-time plant diagnosis powered by AI</div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+</div>
+ 
+<div class="navbar">
+  <div class="logo">Flora AI</div>
+  <div class="nav-links">
+    <a data-page="home" class="active-nav" onclick="showPage('home')">Home</a>
+    <a data-page="scan" onclick="showPage('scan')">Scan</a>
+    <a data-page="result" onclick="showPage('result')">Result</a>
+    <a data-page="plants" onclick="showPage('plants')">My Plants</a>
+  </div>
+  <label class="toggle-switch">
+  <input type="checkbox" id="themeToggle" onchange="toggleMode()">
+  <span class="toggle-track">
+    <span class="toggle-thumb"></span>
+  </span>
+</label>
+</div>
+ 
+<!-- ══ HOME ══ -->
+<div id="home" class="page active">
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <h1>Flora</h1>
+    <p>Real-time plant diagnosis powered by AI vision</p>
+    <button class="btn" onclick="showPage('scan')">Start Scanning</button>
+    <div class="features">
+      <div class="feature">📸 Live Camera</div>
+      <div class="feature">🧠 AI Detection</div>
+      <div class="feature">⚡ Instant Results</div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ══ SCAN ══ -->
+<div id="scan" class="page">
+  <div class="hero">
+    <h1>Scan Plant</h1>
+    <p>Use your camera or upload a photo</p>
+ 
+    <div class="mode-tabs">
+      <button class="tab active-tab" id="tabCamera" onclick="switchMode('camera')">📸 Camera</button>
+      <button class="tab" id="tabUpload" onclick="switchMode('upload')">🖼 Upload Photo</button>
+    </div>
+ 
+    <div id="cameraMode">
+      <p class="scan-tip">
+        <span class="scan-tip-dot"></span>
+        Hold 6–12 inches from the leaf for best results
+      </p>
+ 
+      <div class="camera-box">
+        <video id="video" autoplay playsinline></video>
+        <img id="snapshot" />
+        <div class="reticle-corner tl"></div>
+        <div class="reticle-corner tr"></div>
+        <div class="reticle-corner bl"></div>
+        <div class="reticle-corner br"></div>
+        <div class="reticle-center"></div>
+      </div>
+ 
+      <div class="scan-btn-row">
+        <button class="btn-primary-filled" onclick="startCamera()">Start Camera</button>
+        <button class="btn" onclick="captureCamera()">Analyze Plant</button>
+      </div>
+    </div>
+ 
+    <div id="uploadMode" style="display:none;">
+      <p class="scan-tip">
+        <span class="scan-tip-dot"></span>
+        Clear, well-lit photos give the best diagnosis
+      </p>
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon" id="uploadIcon">🌿</div>
+        <p id="uploadText">Tap to choose a photo</p>
+        <img class="preview" id="uploadPreview" style="display:none;" />
+      </div>
+      <input type="file" id="fileInput" accept="image/*" onchange="handleUpload(event)" />
+      <div class="scan-btn-row">
+        <button class="btn-primary-filled" onclick="captureUpload()">Analyze Plant</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ══ RESULT ══ -->
+<div id="result" class="page">
+  <div class="hero">
+    <h1>AI Diagnosis</h1>
+    <p>Here's what we found</p>
+    <div class="card">
+      <h3 id="issue">Waiting for scan...</h3>
+      <p id="desc">No plant analyzed yet. Go to the Scan page to begin.</p>
+    </div>
+    <button class="btn" id="saveBtn" onclick="savePlant()" style="display:none;">Save to My Plants</button>
+    <button class="btn" onclick="showPage('scan')" style="margin-left:10px;">Go to Scan</button>
+  </div>
+</div>
+ 
+<!-- ══ MY PLANTS ══ -->
+<div id="plants" class="page">
+  <div class="hero">
+    <h1>My Plants</h1>
+    <p>Your saved diagnoses</p>
+    <div id="plantList" class="plant-grid"></div>
+    <div id="emptyState" class="empty-state">
+      <div>🌱</div>
+      <p>No plants saved yet.<br>Scan one to get started!</p>
+    </div>
+    <button class="btn" onclick="showPage('home')" style="margin-top:30px;">← Back to Home</button>
+  </div>
+</div>
+ 
+<canvas id="canvas" style="display:none;"></canvas>
+ 
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  © 2026 Flora AI — All rights reserved
+</footer>
+ 
+<script>
+let stream;
+let uploadedImage = null;
+let lastDiagnosis = null;
+ 
+/* ── SPLASH ── */
+(function(){
+  const splash = document.getElementById('splash');
+  const shown = sessionStorage.getItem('flora_splash');
+  if(shown){
+    splash.style.display = 'none';
+    return;
+  }
+  sessionStorage.setItem('flora_splash', '1');
+  setTimeout(() => {
+    splash.classList.add('hide');
+    setTimeout(() => { splash.style.display = 'none'; }, 650);
+  }, 4500);
+})();
+ 
+window.onload = () => { loadSavedPlants(); };
+ 
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active-nav', a.dataset.page === id);
+  });
+  if(id === 'plants') updateEmptyState();
+  if(id === 'result' && !lastDiagnosis) {
+    document.getElementById('issue').innerText = "Waiting for scan...";
+    document.getElementById('desc').innerText = "No plant analyzed yet. Go to the Scan page to begin.";
+    document.getElementById('saveBtn').style.display = 'none';
+  }
+}
+ 
+function toggleMode(){
+  document.body.classList.toggle('dark');
+}
+ 
+function switchMode(mode){
+  const cameraMode = document.getElementById('cameraMode');
+  const uploadMode  = document.getElementById('uploadMode');
+  const tabCamera   = document.getElementById('tabCamera');
+  const tabUpload   = document.getElementById('tabUpload');
+  if(mode === 'camera'){
+    cameraMode.style.display = 'block';
+    uploadMode.style.display  = 'none';
+    tabCamera.classList.add('active-tab');
+    tabUpload.classList.remove('active-tab');
+  } else {
+    cameraMode.style.display = 'none';
+    uploadMode.style.display  = 'block';
+    tabCamera.classList.remove('active-tab');
+    tabUpload.classList.add('active-tab');
+    if(stream){ stream.getTracks().forEach(t => t.stop()); }
+  }
+}
+ 
+async function startCamera(){
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    video.style.display = 'block';
+    document.getElementById('snapshot').style.display = 'none';
+  } catch(err){
+    alert("Camera access denied. Portfolio Note: Browser requires HTTPS for camera access.");
+  }
+}
+ 
+function captureCamera(){
+  if(!stream){ alert("Please start the camera first."); return; }
+  const video    = document.getElementById('video');
+  const canvas   = document.getElementById('canvas');
+  const snapshot = document.getElementById('snapshot');
+  canvas.width  = video.videoWidth  || 300;
+  canvas.height = video.videoHeight || 400;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const imageBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+  snapshot.src = canvas.toDataURL('image/jpeg', 0.8);
+  snapshot.style.display = 'block';
+  video.style.display = 'none';
+  showPage('result');
+  analyzeWithGemini(imageBase64);
+}
+ 
+function handleUpload(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById('uploadPreview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('uploadIcon').style.display = 'none';
+    document.getElementById('uploadText').style.display = 'none';
+    uploadedImage = e.target.result.split(',')[1];
+  };
+  reader.readAsDataURL(file);
+}
+ 
+function resetUploadUI(){
+  uploadedImage = null;
+  document.getElementById('fileInput').value = "";
+  document.getElementById('uploadPreview').style.display = 'none';
+  document.getElementById('uploadIcon').style.display = 'block';
+  document.getElementById('uploadText').style.display = 'block';
+}
+ 
+function captureUpload(){
+  if(!uploadedImage){ alert("Please select a photo first."); return; }
+  const currentImage = uploadedImage;
+  resetUploadUI();
+  showPage('result');
+  analyzeWithGemini(currentImage);
+}
+ 
+async function analyzeWithGemini(imageBase64){
+  const issueEl = document.getElementById('issue');
+  const descEl  = document.getElementById('desc');
+  const saveBtn = document.getElementById('saveBtn');
+  issueEl.innerHTML = '<span class="spinner"></span> Analyzing...';
+  descEl.innerText  = 'Communicating with serverless function...';
+  saveBtn.style.display = 'none';
+  lastDiagnosis = null;
+  try {
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imageBase64 })
+    });
+    const data = await response.json();
+    if(data.error){
+      issueEl.innerText = 'Analysis Error';
+      descEl.innerText  = 'Make sure the GEMINI_API_KEY is set in Vercel.';
+      return;
+    }
+    const rawText  = data.candidates[0].content.parts[0].text;
+    const jsonStart = rawText.indexOf('{');
+    const jsonEnd   = rawText.lastIndexOf('}') + 1;
+    const result    = JSON.parse(rawText.substring(jsonStart, jsonEnd));
+    issueEl.innerText = result.issue;
+    descEl.innerText  = result.description;
+    lastDiagnosis = result;
+    saveBtn.style.display = 'inline-block';
+  } catch(err){
+    issueEl.innerText = 'Analysis Failed';
+    descEl.innerText  = 'The AI server could not be reached or returned invalid data.';
+    console.error("Fetch error:", err);
+  }
+}
+ 
+function savePlant(){
+  if(!lastDiagnosis) return;
+  const saved = JSON.parse(localStorage.getItem('flora_plants') || '[]');
+  saved.push(lastDiagnosis);
+  localStorage.setItem('flora_plants', JSON.stringify(saved));
+  renderPlantCard(lastDiagnosis);
+  showPage('plants');
+}
+ 
+function loadSavedPlants(){
+  const saved = JSON.parse(localStorage.getItem('flora_plants') || '[]');
+  saved.forEach(plant => renderPlantCard(plant));
+  updateEmptyState();
+}
+ 
+function renderPlantCard(plantData){
+  const list = document.getElementById('plantList');
+  const card = document.createElement('div');
+  card.className = 'plant-card';
+  card.innerHTML = `
+    <button class="remove-btn" onclick="removePlant(this)">✕</button>
+    <div style="font-size:28px;margin-bottom:8px;">🌿</div>
+    <strong style="font-size:13px;color:var(--primary);">${plantData.issue}</strong>
+    <p style="font-size:12px;margin-top:6px;opacity:0.75;line-height:1.5;">${plantData.description}</p>
+  `;
+  list.appendChild(card);
+}
+ 
+function removePlant(btnElement){
+  const card = btnElement.parentElement;
+  const issueText = card.querySelector('strong').innerText;
+  let saved = JSON.parse(localStorage.getItem('flora_plants') || '[]');
+  saved = saved.filter(p => p.issue !== issueText);
+  localStorage.setItem('flora_plants', JSON.stringify(saved));
+  card.style.opacity   = '0';
+  card.style.transform = 'scale(0.8)';
+  setTimeout(() => { card.remove(); updateEmptyState(); }, 300);
+}
+ 
+function updateEmptyState(){
+  const list  = document.getElementById('plantList');
+  const empty = document.getElementById('emptyState');
+  empty.style.display = list.children.length === 0 ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
+ 
