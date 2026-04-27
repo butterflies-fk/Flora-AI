@@ -254,37 +254,44 @@ function captureUpload(){
   analyzeWithGemini(currentImage);
 }
  
-async function analyzeWithGemini(imageBase64){
+async function analyzeWithGemini(imageBase64) {
   const issueEl = document.getElementById('issue');
   const descEl  = document.getElementById('desc');
   const saveBtn = document.getElementById('saveBtn');
+  
   issueEl.innerHTML = '<span class="spinner"></span> Analyzing...';
-  descEl.innerText  = 'Communicating with serverless function...';
+  descEl.innerText  = 'Communicating with server...';
   saveBtn.style.display = 'none';
-  lastDiagnosis = null;
+
   try {
     const response = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image: imageBase64 })
     });
-    const data = await response.json();
-    if(data.error){
-      issueEl.innerText = 'Analysis Error';
-      descEl.innerText  = 'Make sure the GEMINI_API_KEY is set in Vercel.';
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      issueEl.innerText = 'Analysis Failed';
+      descEl.innerText = result.error || 'Something went wrong.';
       return;
     }
-    const rawText  = data.candidates[0].content.parts[0].text;
-    const jsonStart = rawText.indexOf('{');
-    const jsonEnd   = rawText.lastIndexOf('}') + 1;
-    const result    = JSON.parse(rawText.substring(jsonStart, jsonEnd));
+
+    if (!result.issue || !result.description) {
+      issueEl.innerText = 'Analysis Failed';
+      descEl.innerText = 'Unexpected response from server.';
+      return;
+    }
+
+    lastDiagnosis = result;
     issueEl.innerText = result.issue;
     descEl.innerText  = result.description;
-    lastDiagnosis = result;
     saveBtn.style.display = 'inline-block';
-  } catch(err){
+
+  } catch(err) {
     issueEl.innerText = 'Analysis Failed';
-    descEl.innerText  = 'The AI server could not be reached or returned invalid data.';
+    descEl.innerText  = err.message;
     console.error("Fetch error:", err);
   }
 }
