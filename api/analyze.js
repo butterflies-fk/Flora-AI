@@ -1,11 +1,17 @@
+cat > api/analyze.js << 'EOF'
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
     try {
-        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        let body = req.body;
+        if (!body) return res.status(400).json({ error: 'No body received' });
+        if (typeof body === 'string') {
+            try { body = JSON.parse(body); } catch(e) { return res.status(400).json({ error: 'Invalid JSON' }); }
+        }
         let image = body.image;
+        if (!image) return res.status(400).json({ error: 'No image received' });
         const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) return res.status(500).json({ error: "Make sure the GEMINI_API_KEY is set in Vercel." });
-        if (image && image.includes(',')) image = image.split(',')[1];
+        if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY not set" });
+        if (image.includes(',')) image = image.split(',')[1];
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
             {
@@ -32,4 +38,5 @@ export default async function handler(req, res) {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-  }
+}
+EOF
