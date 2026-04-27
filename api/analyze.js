@@ -1,4 +1,3 @@
-cat > api/analyze.js << 'EOF'
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
     try {
@@ -39,4 +38,3 @@ module.exports = async function handler(req, res) {
         res.status(500).json({ error: error.message });
     }
 }
-EOF
