@@ -260,7 +260,7 @@ async function analyzeWithGemini(imageBase64) {
   const saveBtn = document.getElementById('saveBtn');
   
   issueEl.innerHTML = '<span class="spinner"></span> Analyzing...';
-  descEl.innerText  = 'Communicating with server...';
+  descEl.innerText  = 'AI is analyzing your plant...';
   saveBtn.style.display = 'none';
 
   try {
@@ -274,7 +274,7 @@ async function analyzeWithGemini(imageBase64) {
 
     if (!response.ok) {
       issueEl.innerText = 'Analysis Failed';
-      descEl.innerText = result.error || 'Something went wrong.';
+      descEl.innerText = result.error || "Today's AI scans are used up - come back tomorrow!";
       return;
     }
 
