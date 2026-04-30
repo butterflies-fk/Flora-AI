@@ -7,6 +7,107 @@
 <link rel="icon" type="image/png" href="icon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;1,300&family=Yeseva+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+/* ── TIPS PAGE ── */
+.tips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin: 30px auto 10px;
+  max-width: 860px;
+}
+
+.tips-section-title {
+  font-family: 'Yeseva One', serif;
+  font-size: 22px;
+  color: var(--primary);
+  margin: 40px 0 6px;
+  width: 100%;
+  text-align: center;
+}
+
+.tips-section-subtitle {
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.6;
+  margin: 0 0 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.tip-card {
+  background: var(--card);
+  border: 1px solid rgba(111,143,107,0.15);
+  border-radius: 20px;
+  padding: 22px 20px;
+  width: 240px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  backdrop-filter: blur(10px);
+  text-align: left;
+}
+
+
+
+.tip-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 8px;
+}
+
+.tip-card p {
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.78;
+  margin: 0;
+  font-style: normal;
+}
+
+.tip-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.tip-tag.care {
+  background: rgba(111,143,107,0.13);
+  color: var(--primary);
+  border: 1px solid rgba(111,143,107,0.3);
+}
+
+.tip-tag.pest {
+  background: rgba(180,100,80,0.1);
+  color: #b46450;
+  border: 1px solid rgba(180,100,80,0.25);
+}
+
+.dark .tip-tag.pest {
+  color: #e08a72;
+  border-color: rgba(224,138,114,0.3);
+  background: rgba(224,138,114,0.1);
+}
+
+.tips-divider {
+  width: 100%;
+  max-width: 860px;
+  margin: 10px auto 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(111,143,107,0.25), transparent);
+}
+
+@media (max-width: 540px) {
+  .tip-card {
+    width: 90%;
+    max-width: 340px;
+  }
+}
+</style>
 </head>
  
 <body>
@@ -26,6 +127,7 @@
     <a data-page="scan" onclick="showPage('scan')">Scan</a>
     <a data-page="result" onclick="showPage('result')">Result</a>
     <a data-page="plants" onclick="showPage('plants')">My Plants</a>
+    <a data-page="tips" onclick="showPage('tips')">Tips</a>
   </div>
   <label class="toggle-switch">
   <input type="checkbox" id="themeToggle" onchange="toggleMode()">
@@ -126,6 +228,79 @@
       <p>No plants saved yet.<br>Scan one to get started!</p>
     </div>
     <button class="btn" onclick="showPage('home')" style="margin-top:30px;">← Back to Home</button>
+  </div>
+</div>
+
+<!-- ══ TIPS ══ -->
+<div id="tips" class="page">
+  <div class="hero">
+    <h1>Plant Tips</h1>
+    <p>Care guides & pest prevention for healthy plants</p>
+
+    <div class="tips-grid">
+
+      <!-- PLANT CARE SECTION -->
+      <div class="tips-section-title">Plant Care</div>
+      <div class="tips-section-subtitle">Essential habits to keep your plants thriving</div>
+
+      <div class="tip-card">
+        <span class="tip-tag care">Care</span>
+        <h3>Check Before You Water</h3>
+        <p>Stick your finger an inch into the soil. If it still feels damp, wait a day or two. Overwatering is the most common way plants die.</p>
+      </div>
+
+      <div class="tip-card">
+        <span class="tip-tag care">Care</span>
+        <h3>Find the Right Spot</h3>
+        <p>Most plants love bright, indirect light near a window. If your plant is leaning toward the light or losing colour, try moving it somewhere brighter.</p>
+      </div>
+
+      <div class="tip-card">
+        <span class="tip-tag care">Care</span>
+        <h3>Remove Dead Leaves</h3>
+        <p>Snip off any yellow or brown leaves as soon as you notice them. It keeps your plant looking healthy and stops it wasting energy on leaves it can't save.</p>
+      </div>
+
+      <div class="tip-card">
+        <span class="tip-tag care">Care</span>
+        <h3>Repot When It's Cramped</h3>
+        <p>If roots are poking out of the bottom of the pot, your plant needs more room. Move it to a slightly bigger pot with fresh soil — it'll thank you!</p>
+      </div>
+
+      <div class="tips-divider"></div>
+
+      <!-- PEST & DISEASE SECTION -->
+      <div class="tips-section-title">Pest & Disease Prevention</div>
+      <div class="tips-section-subtitle">Simple steps to catch problems before they spread</div>
+
+      <div class="tip-card">
+        <span class="tip-tag pest">Pest</span>
+        <h3>Check Your Plant Weekly</h3>
+        <p>Take a quick look under the leaves every week. Tiny bugs or white spots are a sign of pests. The sooner you catch them, the easier they are to deal with.</p>
+      </div>
+
+      <div class="tip-card">
+        <span class="tip-tag pest">Pest</span>
+        <h3>Rinse Bugs Off</h3>
+        <p>Spotted bugs on your plant? A good rinse in the shower or with a hose works surprisingly well. Repeat every few days until they're gone.</p>
+      </div>
+
+      <div class="tip-card">
+        <span class="tip-tag pest">Pest</span>
+        <h3>Isolate New Plants</h3>
+        <p>Keep any new plant away from your others for about two weeks. New plants can carry hidden pests that spread quickly to the rest of your collection.</p>
+      </div>
+
+      <div class="tip-card">
+        <span class="tip-tag pest">Pest</span>
+        <h3>Watch for Yellow Leaves + Wet Soil</h3>
+        <p>If your plant has yellow leaves and the soil is always wet, it likely has root rot. Let it dry out, remove the soggy roots, and repot in fresh soil.</p>
+      </div>
+
+    </div>
+
+    <button class="btn" onclick="showPage('scan')" style="margin-top:36px;">Scan a Plant</button>
+
   </div>
 </div>
  
