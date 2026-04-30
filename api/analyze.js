@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
                     contents: [{
                         parts: [
                             { inline_data: { mime_type: 'image/jpeg', data: image } },
-                            { text: 'Analyze this plant. Return ONLY valid JSON with keys "issue" and "description".' }
+                            { text: 'Analyze this plant. Return ONLY valid JSON with three keys: "issue" (the problem name), "description" (what is wrong), and "solution" (how to fix it).' }
                         ]
                     }]
                 })
