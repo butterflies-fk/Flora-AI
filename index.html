@@ -109,7 +109,7 @@
     <div class="card">
   <h3 id="issue">Waiting for scan...</h3>
   <p id="desc">No plant analyzed yet. Go to the Scan page to begin.</p>
-  <p id="solution" style="display:none;margin-top:12px;border-top:1px solid rgba(0,0,0,0.1);padding-top:12px;"></p>
+  <p id="solution"></p>
 </div>
     <button class="btn" id="saveBtn" onclick="savePlant()" style="display:none;">Save to My Plants</button>
     <button class="btn" onclick="showPage('scan')" style="margin-left:10px;">Go to Scan</button>
@@ -174,7 +174,7 @@ function showPage(id){
   }
   if(id === 'result') {
     lastDiagnosis = null;
-    document.getElementById('solution').style.display = 'none';
+    document.getElementById('solution').classList.remove('visible');
     document.getElementById('solution').innerText = '';
   }
   if(id === 'result' && !lastDiagnosis) {
@@ -232,7 +232,7 @@ function captureCamera(){
   snapshot.style.display = 'block';
   video.style.display = 'none';
   lastDiagnosis = null;
-  document.getElementById('solution').style.display = 'none';
+  document.getElementById('solution').classList.remove('visible');
   showPage('result');
   setTimeout(() => analyzeWithGemini(imageBase64), 50);
 }
@@ -265,7 +265,7 @@ function captureUpload(){
   const currentImage = uploadedImage;
   resetUploadUI();
   lastDiagnosis = null;
-  document.getElementById('solution').style.display = 'none';
+  document.getElementById('solution').classList.remove('visible');
   showPage('result');
   setTimeout(() => analyzeWithGemini(currentImage), 50);
 }
@@ -279,7 +279,7 @@ async function analyzeWithGemini(imageBase64) {
   issueEl.innerHTML = '<span class="spinner"></span> Analyzing...';
   descEl.innerText  = 'AI is analyzing your plant...';
   solutionEl.innerText = '';
-  solutionEl.style.display = 'none';
+  solutionEl.classList.remove('visible');
   saveBtn.style.display = 'none';
   
 
@@ -309,9 +309,9 @@ async function analyzeWithGemini(imageBase64) {
     descEl.innerText  = result.description;
     if (result.solution) {
       solutionEl.innerText = '💡 ' + result.solution;
-      solutionEl.style.display = 'block';
+      solutionEl.classList.add('visible');
     } else {
-      solutionEl.style.display = 'none';
+      solutionEl.classList.remove('visible');
     }
     saveBtn.style.display = 'inline-block';
 
