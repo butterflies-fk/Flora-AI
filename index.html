@@ -292,7 +292,6 @@ async function analyzeWithGemini(imageBase64) {
     lastDiagnosis = result;
     issueEl.innerText = result.issue;
     descEl.innerText  = result.description;
-    const solutionEl = document.getElementById('solution');
     if (result.solution) {
       solutionEl.innerText = '💡 ' + result.solution;
       solutionEl.style.display = 'block';
