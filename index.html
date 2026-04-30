@@ -223,6 +223,7 @@ function captureCamera(){
   snapshot.src = canvas.toDataURL('image/jpeg', 0.8);
   snapshot.style.display = 'block';
   video.style.display = 'none';
+  lastDiagnosis = null;
   document.getElementById('solution').style.display = 'none';
   showPage('result');
   analyzeWithGemini(imageBase64);
@@ -255,6 +256,7 @@ function captureUpload(){
   if(!uploadedImage){ alert("Please select a photo first."); return; }
   const currentImage = uploadedImage;
   resetUploadUI();
+  lastDiagnosis = null;
   document.getElementById('solution').style.display = 'none';
   showPage('result');
   analyzeWithGemini(currentImage);
