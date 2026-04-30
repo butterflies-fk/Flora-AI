@@ -106,10 +106,9 @@
   <div class="hero">
     <h1>AI Diagnosis</h1>
     <p>Here's what we found</p>
-    <div class="card">
+    <div class="card" id="resultCard">
       <h3 id="issue">Waiting for scan...</h3>
       <p id="desc">No plant analyzed yet. Go to the Scan page to begin.</p>
-      <p id="solution"></p>
     </div>
     <button class="btn" id="saveBtn" onclick="savePlant()" style="display:none;">Save to My Plants</button>
     <button class="btn" onclick="showPage('scan')" style="margin-left:10px;">Go to Scan</button>
@@ -142,21 +141,25 @@ let stream;
 let uploadedImage = null;
 let lastDiagnosis = null;
 
-function hideSolution() {
+function removeSolution() {
   const el = document.getElementById('solution');
-  el.removeAttribute('style');
-  el.classList.remove('visible');
-  el.innerText = '';
+  if (el) el.remove();
+}
+
+function addSolution(text) {
+  removeSolution();
+  const sol = document.createElement('p');
+  sol.id = 'solution';
+  sol.innerText = '💡 ' + text;
+  sol.style.cssText = 'margin-top:12px;border-top:1px solid rgba(0,0,0,0.1);padding-top:12px;font-size:14px;line-height:1.7;';
+  document.getElementById('resultCard').appendChild(sol);
 }
  
 /* ── SPLASH ── */
 (function(){
   const splash = document.getElementById('splash');
   const shown = sessionStorage.getItem('flora_splash');
-  if(shown){
-    splash.style.display = 'none';
-    return;
-  }
+  if(shown){ splash.style.display = 'none'; return; }
   sessionStorage.setItem('flora_splash', '1');
   setTimeout(() => {
     splash.classList.add('hide');
@@ -181,9 +184,7 @@ function showPage(id){
   }
   if(id === 'result') {
     lastDiagnosis = null;
-    hideSolution();
-  }
-  if(id === 'result' && !lastDiagnosis) {
+    removeSolution();
     document.getElementById('issue').innerText = "Waiting for scan...";
     document.getElementById('desc').innerText = "No plant analyzed yet. Go to the Scan page to begin.";
     document.getElementById('saveBtn').style.display = 'none';
@@ -237,8 +238,6 @@ function captureCamera(){
   snapshot.src = canvas.toDataURL('image/jpeg', 0.8);
   snapshot.style.display = 'block';
   video.style.display = 'none';
-  lastDiagnosis = null;
-  hideSolution();
   showPage('result');
   setTimeout(() => analyzeWithGemini(imageBase64), 50);
 }
@@ -270,8 +269,6 @@ function captureUpload(){
   if(!uploadedImage){ alert("Please select a photo first."); return; }
   const currentImage = uploadedImage;
   resetUploadUI();
-  lastDiagnosis = null;
-  hideSolution();
   showPage('result');
   setTimeout(() => analyzeWithGemini(currentImage), 50);
 }
@@ -279,12 +276,11 @@ function captureUpload(){
 async function analyzeWithGemini(imageBase64) {
   const issueEl = document.getElementById('issue');
   const descEl  = document.getElementById('desc');
-  const solutionEl = document.getElementById('solution');
   const saveBtn = document.getElementById('saveBtn');
   
   issueEl.innerHTML = '<span class="spinner"></span> Analyzing...';
   descEl.innerText  = 'AI is analyzing your plant...';
-  hideSolution();
+  removeSolution();
   saveBtn.style.display = 'none';
 
   try {
@@ -311,12 +307,7 @@ async function analyzeWithGemini(imageBase64) {
     lastDiagnosis = result;
     issueEl.innerText = result.issue;
     descEl.innerText  = result.description;
-    if (result.solution) {
-      solutionEl.innerText = '💡 ' + result.solution;
-      solutionEl.classList.add('visible');
-    } else {
-      hideSolution();
-    }
+    if (result.solution) addSolution(result.solution);
     saveBtn.style.display = 'inline-block';
 
   } catch(err) {
