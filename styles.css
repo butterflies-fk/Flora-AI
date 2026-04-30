@@ -179,6 +179,10 @@
     flex: 1;
     animation: fadeIn 0.4s ease;
   }
+
+  #result.active #solution {
+    display: none;
+  }
   
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
