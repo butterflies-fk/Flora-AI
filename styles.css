@@ -628,7 +628,7 @@
     }
   }
 
-  #solution {
+  .card #solution {
     visibility: hidden !important;
     height: 0 !important;
     margin: 0 !important;
@@ -636,7 +636,7 @@
     overflow: hidden;
 }
 
-#solution.visible {
+.card #solution.visible {
     visibility: visible !important;
     height: auto !important;
     margin-top: 12px !important;
