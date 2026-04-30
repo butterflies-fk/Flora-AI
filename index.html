@@ -166,6 +166,9 @@ function showPage(id){
     a.classList.toggle('active-nav', a.dataset.page === id);
   });
   if(id === 'plants') updateEmptyState();
+  if(id === 'result') {
+    document.getElementById('solution').style.display = 'none';
+  }
   if(id === 'result' && !lastDiagnosis) {
     document.getElementById('issue').innerText = "Waiting for scan...";
     document.getElementById('desc').innerText = "No plant analyzed yet. Go to the Scan page to begin.";
