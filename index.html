@@ -258,6 +258,7 @@ function captureUpload(){
 async function analyzeWithGemini(imageBase64) {
   const issueEl = document.getElementById('issue');
   const descEl  = document.getElementById('desc');
+  const solutionEl = document.getElementById('solution');
   const saveBtn = document.getElementById('saveBtn');
   
   issueEl.innerHTML = '<span class="spinner"></span> Analyzing...';
