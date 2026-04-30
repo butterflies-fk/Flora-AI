@@ -234,7 +234,7 @@ function captureCamera(){
   lastDiagnosis = null;
   document.getElementById('solution').style.display = 'none';
   showPage('result');
-  analyzeWithGemini(imageBase64);
+  setTimeout(() => analyzeWithGemini(imageBase64), 50);
 }
  
 function handleUpload(event){
@@ -267,7 +267,7 @@ function captureUpload(){
   lastDiagnosis = null;
   document.getElementById('solution').style.display = 'none';
   showPage('result');
-  analyzeWithGemini(currentImage);
+  setTimeout(() => analyzeWithGemini(currentImage), 50);
 }
  
 async function analyzeWithGemini(imageBase64) {
